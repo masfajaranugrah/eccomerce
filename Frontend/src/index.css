@@ -1,0 +1,129 @@
+@import url("https://fonts.googleapis.com/css2?family=Island+Moments&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&display=swap");
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+:root {
+  --primary-color: #ff7e01;
+  --secondary-color: #faa935;
+  --heading-color: #0b2727;
+  --text-color: #6e7074;
+  --font-name: "Montserrat", sans-serif;
+  --subtitle-font-name: "Island Moments", cursive;
+  --font-size--menu: 20px;
+  --font-size--title : 40px;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: var(--font-name);
+  font-size: var(--font-size--menu);
+  background-color: #fdf5f5;
+  color: rgb(70, 0, 182);
+}
+.top-hero{
+  font-family: var(--subtitle-font-name);
+  font-weight: bold;
+  font-size: 20px;
+}
+
+
+.sticky__nav {
+  top:0;
+  left: 0;
+  background-color: #fdf5f5;
+  padding: 10px 0;
+  position: sticky;
+  z-index: 999;
+  border-bottom: 1px solid orangered;
+}
+
+.rounded{
+  cursor: pointer;
+  border-radius:15px 0 15px 0 ;
+  -webkit-border-radius:15px 0 15px 0 ;
+  -moz-border-radius:15px 0 15px 0 ;
+  -ms-border-radius:15px 0 15px 0 ;
+  -o-border-radius:15px 0 15px 0 ;
+}
+.round:before {
+  content: '';
+  border-radius: 50% ;
+  -webkit-border-radius: 50% ;
+  -moz-border-radius: 50% ;
+  -ms-border-radius: 50% ;
+  -o-border-radius: 50% ;
+  width: 20px;
+  background: #ff7e01;
+  height: 20px;
+  left: 18rem;
+  top: 24rem;
+  position: absolute;
+}
+.round:after {
+  content: '';
+  border-radius: 50% ;
+  -webkit-border-radius: 50% ;
+  -moz-border-radius: 50% ;
+  -ms-border-radius: 50% ;
+  -o-border-radius: 50% ;
+  width: 20px;
+  background: #ff7e01;
+  height: 20px;
+  left: 18rem;
+  top: 24rem;
+  position: absolute;
+}
+@keyframes ping {
+  75%, 100% {
+      transform: scale(2);
+      opacity: 0;
+  }
+}
+.round:before {
+  animation: ping 1s cubic-bezier(0, 0, 0.2, 1) infinite;
+}
+
+.border-rund {
+  border-radius: 15px 5px 15px 5px;
+  -webkit-border-radius: 15px 5px 15px 5px;
+  -moz-border-radius: 15px 5px 15px 5px;
+  -ms-border-radius: 15px 5px 15px 5px;
+  -o-border-radius: 15px 5px 15px 5px;
+}
+
+.bg {
+  background: linear-gradient(rgba(0,0,0,0.45), rgba(0,0,0,0.45)), url('./assets/images/gallery-01.jpg') no-repeat center center;
+  height: 300px;
+  position: relative;
+  background-size:cover;
+  background-posithxion: center;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.active__page {
+  width: 40px;
+  height: 40px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: 50%;
+  color: white;
+  -webkit-border-radius: 50%;
+  -moz-border-radius: 50%;
+  -ms-border-radius: 50%;
+  cursor: pointer;
+  -o-border-radius: 50%;
+  background-color: #ff7e01;
+}
+.thx {
+  font-family: var(--subtitle-font-name);
+  font-size: 50px;
+}
