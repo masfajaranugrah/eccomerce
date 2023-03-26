@@ -1,5 +1,5 @@
-import React, {useEffect, useRef, useState} from "react";
-import { useParams } from "react-router-dom";
+import React, {useEffect, useRef, useState, useContext} from "react";
+import { useParams , useNavigate} from "react-router-dom";
 import tourData from "../data/tours";
 import { CalculateavgRating } from "../Utils";
 import avatar from "../assets/images/avatar.jpg";
@@ -7,10 +7,20 @@ import Booking from "../Components/Booking/Booking";
 import { NewsLetter } from "../shared";
 import useFetch from "../hooks/useFetch";
 import { BASE_URL } from "../Utils/config";
+import { AuthContext } from "../context/AuthContext";
 const TourDetailsList = () => {
 
-  const { id } = useParams();
-  const {data: tour , loading, error} = useFetch(`${BASE_URL}/tours/${id}`)
+  const { id } = useParams();  
+  const reviewMsgRef = useRef('') 
+  const [tourRating , setTourRating] =  useState(null)
+  const [start, setStart] = useState(false)
+
+  const handleStart = () => {
+    setStart(!start)
+  }
+
+
+  const {data: tour } = useFetch(`${BASE_URL}/tours/${id}`)
 
   const { city, price, photo, desc, reviews, maxGroupSize } = tour;
   const { totalRating, avgRating } = CalculateavgRating(reviews);
@@ -18,17 +28,44 @@ const TourDetailsList = () => {
   //format date
   const options = { day: "numeric", month: "long", year: "numeric" };
 
-  const reviewMsgRef = useRef('')
-  const [tourRating , setTourRating] =  useState(null)
 
-
+ 
+  const {user} = useContext(AuthContext)
 
   // handle submit 
-  const handleSubmit = e => {
+  const handleSubmit = async e => {
     e.preventDefault()
-   const reviewText = reviewMsgRef.current.value
+   const reviewText = reviewMsgRef.current.value;
 
-   alert(`${reviewText}, ${tourRating}`)
+  
+   try {
+    
+    if(!user || user === undefined || user === null){
+    alert("Please sign in")
+   }
+
+
+   const reviewObj = {
+    username: user.username,
+    reviewText,
+    rating: tourRating
+   }
+
+   const res = await fetch(`${BASE_URL}/review/${id}`, {
+    method: 'post',
+    headers: {
+      'content-type': 'application/json'
+    },
+   body: JSON.stringify(reviewObj)
+  });
+    const result = await res.json()
+    if(!res.ok) {
+      return alert(result.message)
+    }
+    alert('rating submitted')
+   } catch (err) {
+      alert(err.message)
+   }
   }
 
 useEffect(() => {
@@ -84,22 +121,48 @@ useEffect(() => {
               <div className="mt-10">
                 <h4>Reviews ({reviews?.length} reviews) </h4>
                 
-                <form onSubmit={handleSubmit} className='mt-5  cursor-pointer'>
+                <form onSubmit={handleSubmit} method='post' className='mt-5  cursor-pointer'>
                      <div className="flex gap-x-5 justify-start items-center">
-                    <span onClick={(() => setTourRating(1))} className="flex justify-center text-gray-500 active:text-orange-500 items-center gap-x-2">
-                      1<i class="ri-star-fill"></i>
+                    <span onClick={(() => setTourRating(1))} className="flex justify-center text-orange-500 active:text-orange-500 items-center gap-x-2">
+                        <div onClick={(() => handleStart())}>
+                            {
+                              start ? <i class="ri-star-fill"></i> : <i class="ri-star-line"></i>
+                            }
+                        </div>
+                
                     </span>
-                    <span onClick={(() => setTourRating(2))} className="flex justify-center text-gray-500 active:text-orange-500 items-center gap-x-2">
-                      2<i class="ri-star-fill"></i>
+                    <span onClick={(() => setTourRating(2))} className="flex justify-center text-orange-500 active:text-orange-500 items-center gap-x-2">
+                    <div onClick={(() => handleStart())}>
+                            {
+                              start ? <i class="ri-star-fill"></i> : <i class="ri-star-line"></i>
+                            }
+                        </div>
+
                     </span>
-                    <span onClick={(() => setTourRating(13))} className="flex justify-center text-gray-500 active:text-orange-500 items-center gap-x-2">
-                      3<i class="ri-star-fill"></i>
+                    <span onClick={(() => setTourRating(13))} className="flex justify-center text-orange-500 active:text-orange-500 items-center gap-x-2">
+                    
+                    <div onClick={(() => handleStart())}>
+                            {
+                              start ? <i class="ri-star-fill"></i> : <i class="ri-star-line"></i>
+                            }
+                        </div>
+
                     </span>
-                    <span onClick={(() => setTourRating(4))} className="flex justify-center text-gray-500 active:text-orange-500 items-center gap-x-2">
-                      4<i class="ri-star-fill"></i>
+                    <span onClick={(() => setTourRating(4))} className="flex justify-center text-orange-500 active:text-orange-500 items-center gap-x-2">
+                        <div onClick={(() => handleStart())}>
+                            {
+                              start ? <i class="ri-star-fill"></i> : <i class="ri-star-line"></i>
+                            }
+                        </div>
+
+
                     </span>
-                    <span onClick={(() => setTourRating(5))} className="flex justify-center text-gray-500 active:text-orange-500 items-center gap-x-2">
-                      5<i class="ri-star-fill"></i>
+                    <span onClick={(() => setTourRating(5))} className="flex justify-center text-orange-500 active:text-orange-500 items-center gap-x-2">
+                       <div onClick={(() => handleStart())}>
+                            {
+                              start ? <i class="ri-star-fill"></i> : <i class="ri-star-line"></i>
+                            }
+                        </div>
                     </span>
                   </div>
                   <div  className="border border-orange-500 rounded-full w-[40rem] py-4 mt-10 px-4">
@@ -117,81 +180,40 @@ useEffect(() => {
                       subscribe
                     </button>
                   </div>
+
+   <section>
+                      <div>
+                          {
+                            reviews?.map(review => (
+                              <section className="flex flex-col item-center justify-center">
+                                <div className="flex ">
+                                   <div className="w-[5rem] ">
+                                   <img src={avatar} alt="logo" className="rounded-full" />
+                                </div>
+                               <div className="w-full py-5 border-b border-black">
+                                <div className="flex justify-between items-center">
+                                  <h5>{review.username}</h5>
+                                <span>{review.rating}</span>
+                                </div>
+                                 
+                                <h6 className="mt-5">{review.reviewText}</h6>
+                               </div>
+                               
+                                </div>
+                               
+                              </section>
+                            ))
+                          }
+                      </div>
+                  </section>
+ 
+
+
                   </form>
                 
                
 
-                  <section>
-                    <div className="flex justify-between items-center mt-5">
-                      <div>
-                        <div className="flex items-center">
-                      <div className="flex justify-start ">
-                        {reviews?.map((reviews) => (
-                          <div className="w-[5rem]">
-                            <img src={avatar} alt="avatar" />
-                          </div>
-                        ))}
-                      </div>
-
-                      <div>
-                        <h5>fajar</h5>
-                        <p>
-                          {new Date("01-18-2023").toLocaleDateString(
-                            "en-US",
-                            options
-                          )}
-                        </p>
-                      </div>
-
-
-                   
-
-                    </div> 
-                    <div className="pl-20">
-                      <p className="text-[25px]">Amazing Tour</p>
-                    </div>
-                    </div>
-                      <div className="">
-                           <span className="gap-x-2 flex justify-center items-center ">5<i class="ri-star-fill"></i></span>
-                      </div>
-                    </div>
-                    
-                    <div className="flex justify-between items-center mt-5">
-                      <div>
-                        <div className="flex items-center">
-                      <div className="flex justify-start ">
-                        {reviews?.map((reviews) => (
-                          <div className="w-[5rem]">
-                            <img src={avatar} alt="avatar" />
-                          </div>
-                        ))}
-                      </div>
-
-                      <div>
-                        <h5>fajar</h5>
-                        <p>
-                          {new Date("01-18-2023").toLocaleDateString(
-                            "en-US",
-                            options
-                          )}
-                        </p>
-                      </div>
-                      641c2489005c852ecedcd893
-
-                   
-
-                    </div> 
-                    <div className="pl-20">
-                      <p className="text-[25px]">Amazing Tour</p>
-                    </div>
-                    </div>
-                      <div className="">
-                           <span className="gap-x-2 flex justify-center items-center ">5<i class="ri-star-fill"></i></span>
-                      </div>
-                    </div>
-
-                  </section>
- 
+               
               </div>
             </div>
           </div>

@@ -1,6 +1,5 @@
 import Booking from '../models/Booking.js'
 
-
 // create booking
 export const createBooking = async(req, res) => {
 

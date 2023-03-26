@@ -127,3 +127,10 @@ body {
   font-family: var(--subtitle-font-name);
   font-size: 50px;
 }
+
+.yy {
+  display: hidden;
+}
+.nn {
+  display: block;
+}

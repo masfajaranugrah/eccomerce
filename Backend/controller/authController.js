@@ -1,9 +1,14 @@
+
 import User from "../models/User.js";
-
 import bcrypt from "bcryptjs";
-import jwt from 'jsonwebtoken'
+import express from 'express'
+import bodyParser from 'body-parser'
+import jwt from "jsonwebtoken";
+const app = express()
+app.use(bodyParser.urlencoded({ extended: true }));
+app.use(bodyParser.json());
 
-export const register = async(req, res) => {
+export const register = async (req, res) => {
     try {
 
         // hashing password 
@@ -11,18 +16,19 @@ export const register = async(req, res) => {
         const hash = bcrypt.hashSync(req.body.password, salt)
 
 
-        const newUser = new User ({
+        const newUser = new User({
             username : req.body.username,
             email: req.body.email,
-            password: hash
+            password: hash,
+            photo: req.body.photo,
         })
 
-        await newUser.save()
+        await newUser.save();
 
         res.status(200).json({message :"success register"})
-    } catch (err) {
-        res.status(500).json({message  :"Filed to register, Try again"})
-        
+    } catch (error) {
+        res.status(500).json({message  :"Gagal", message :error.message})
+        console.log(error.message)
     }
 }
 
@@ -47,20 +53,22 @@ const email = req.body.email
             return  res.status(401).json({message :"incorrect password"})
         }
    
+            const {password, role, ...rest} = user._doc
         // cerate jwt token 
         const token  =  jwt.sign(
             {
-            id:user._id, role:user.role},
+            id: user._id, role: user.role},
             process.env.JWT_SECRET_KEY, 
             // experied time
-            {expiresIn : "15d"}
+            { expiresIn : "15d" }
             );
 
             // set token in the browser cookies and send the response to the client
             res.cookie('accessToken', token, {
                 httpOnly: true,
-                expires:token.expiresIn
-            }).status(200).json({token, data:{...rest}, role} )
+                expires: token.expiresIn
+            }).status(200).json({success : true, message : 'successfully login', 
+            data : {...rest}} )
 
     } catch (err) {
         res.status(500).json({message  :"Filed to login, Try again"})

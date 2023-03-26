@@ -1,9 +1,17 @@
-import React, {useState} from 'react'
-import { Link } from 'react-router-dom'
+import React, {useState, useContext} from 'react'
+import { Link, useNavigate } from 'react-router-dom'
 import { userLogin, userIcon } from '../assets/images'
+
+import { AuthContext } from '../context/AuthContext'
+import { BASE_URL } from '../Utils/config'
+
 
 
 const Login = () => {
+
+  const {dispatch} = useContext(AuthContext)
+  const navigate = useNavigate() 
+
 
   const [credentials, setCredentials] = useState({
    email: undefined,
@@ -14,11 +22,47 @@ const handleChange = e => {
     setCredentials(prev => ({...prev, [e.target.id]:e.target.value}))
 }
 
-const handleClick = e => {
+const handleClick = async e => {
   e.preventDefault()
-  alert(`${emial}`)
-}
+  
+  try {
+   const res = await fetch(`${BASE_URL}/auth/login`, {
+     method: 'post',
+     headers: {
+       'content-type': 'application/json'
+     },
+     body: JSON.stringify(credentials)
+   });
+     const result = await res.json()
+     if(!res.ok) {
+       if (result.message.includes('users not found')) {
+         // error karena username atau email sudah terdaftar
+         alert('Message : email or password failure')
+       } else {
+         // error lainnya
+         alert('Error:', result.message)
+       }
+     } else {
+       alert('LOGIN SUCCESS')
+       navigate('/')
+     }
+ 
+      dispatch({
+       type: 'LOGIN_SUCCESS',
+       payload: result.data
+     });
+    
+ 
+  } catch (err) {
+   console.log(err)
 
+   dispatch({
+    type: 'LOGIN_FAILURE',
+    payload: err.message
+  });
+  }
+ }
+ 
   return (
     <section className='my-20'>
         <div className='flex gap-x-10 border borer-gray-500 bg-white/25 shadow-2xl mx-40 justify-center items-end'>

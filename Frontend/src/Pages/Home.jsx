@@ -11,7 +11,7 @@ import { TourList } from '../Components'
 
 const Home = () => {
   return (
-    <section className='mt-20'>
+    <section className='mt-20 z-20 '>
     <div className='container mx-auto flex justify-center gap-x-10'>
 
         {/* --------- left ----------  */}
@@ -36,7 +36,7 @@ const Home = () => {
 
         <section>
           <div>
-               <video src={hero1} className='bg'/>
+               {/* <video src={hero1} className='bg'/> */}
           </div>
        
         </section>
